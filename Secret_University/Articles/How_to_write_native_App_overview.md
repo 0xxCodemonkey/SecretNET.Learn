@@ -10,7 +10,7 @@ In the end you will have an mobile App that can run on Android, iOS and even on 
 - setup a Secret.NET client and connect to Secret Network
 - create an integrated wallet
 - fund the wallet via testnet faucet
-- query balance and send $SCRT coins
+- query balance of a wallet
 - initialize a secret contract
 - interacting and query a secret contract
 
@@ -99,11 +99,11 @@ Using .NET MAUI, you can create multi-platform apps using a single project, but 
 ## Prerequisites
 You will need [Visual Studio 2022 (17.4)](https://visualstudio.microsoft.com/downloads/) (not Visual Studio Code)  with the .NET MAUI workload installed and you should be familiar with C# and .NET. 
 
-Since this is primarily an article about SecretNET and not about C# / .NET I will only briefly point out the most important basics here. If you want to learn more about C# I suggest you to start [here](https://dotnet.microsoft.com/en-us/learn/csharp).
+Since this is primarily an article about Secret.NET and not about C# / .NET I will only briefly point out the most important basics here. If you want to learn more about C# I suggest you to start [here](https://dotnet.microsoft.com/en-us/learn/csharp).
 
 If you don't know .NET MAUI I definitely recommend you to go through the learning path [here!](https://learn.microsoft.com/en-us/training/paths/build-apps-with-dotnet-maui/), watch the [.NET MAUI for Beginners video series](https://www.youtube.com/playlist?list=PLdo4fOcmZ0oUBAdL2NwBpDs32zwGqb9DY) or check the [.NET MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/?WT.mc_id=dotnet-35129-website&view=net-maui-7.0) and the [Enterprise Application Patterns Using .NET MAUI](https://learn.microsoft.com/en-us/dotnet/architecture/maui/).
 
-The [**GitHub repository of the application final application**](https://github.com/0xxCodemonkey/SecretNET.Examples/tree/main/src/SimpleSecretMauiApp) can be used as reference.
+The [**GitHub repository of the final application**](https://github.com/0xxCodemonkey/SecretNET.Examples/tree/main/src/SimpleSecretMauiApp) can be used as reference.
 
 ## Create a .NET MAUI project and app
 To create a new **.NET MAUI App** project with Visual Studio, in the Create a new project dialog box, select the .NET MAUI project type, and then choose the .NET MAUI App template:
@@ -121,7 +121,7 @@ A newly created .NET MAUI project contains the items as shown:
 
 You can find more details about the project structure / resources and the application startup [here](https://learn.microsoft.com/en-us/training/modules/build-mobile-and-desktop-apps/3-create-a-maui-project-visual-studio?ns-enrollment-type=learningpath&ns-enrollment-id=learn.dotnet-maui.build-apps-with-dotnet-maui).
 
-To check that everything works, run the app by pressing F5.
+To check that everything works, run the app by pressing ``F5``.
 
 ## Install Secret.NET and other useful nuget packages
 Next we load the Secret.NET library and other useful nuget packages.
@@ -130,7 +130,7 @@ For Secret.NET, simply search for "Secret Network" in the NuGet Package Manager 
 
 ![](../resources/install_secretnet_nuget.png)
 
-Additionally we need the [**.NET MAUI Community Toolkit**](https://github.com/CommunityToolkit/Maui)(search "CommunityToolkit.Maui") and the [**.NET MVVM Community Toolkit**](https://github.com/CommunityToolkit/dotnet)(search "CommunityToolkit.Mvvm").
+Additionally we need the [**.NET MAUI Community Toolkit**](https://github.com/CommunityToolkit/Maui) (search "CommunityToolkit.Maui") and the [**.NET MVVM Community Toolkit**](https://github.com/CommunityToolkit/dotnet) (search "CommunityToolkit.Mvvm").
 
 ![](../resources/install_communitytoolkit_nuget.png)
 
@@ -156,7 +156,6 @@ Now we are ready to start building the app.
 - connect to Secret Network
 - have a integrated wallet
 - can query the balance of the wallet
-- can send transactions respectively send $SCRT coins
 - can init, interact and query a secret smart contract.
 
 **A .NET MAUI project initially contains**:
@@ -293,10 +292,12 @@ For this example we will use the SECRET COUNTER contract from the [SECRET BOX](h
 
 We need the following controls on the SmartContractPage for this:
 
-- ``Button`` to init a secret smart contract instance 
+- ``Button`` to init a secret smart contract instance
+- ``Label`` for the contract address
 - ``Label`` for the current counter value
 - ``Button`` to query the counter
 - ``Button`` to increment the counter
+- ``Button`` to reset the counter
 
 Inside the ``VerticalStackLayout`` on the ``SmartContractPage.xaml`` we place our controls (we control the visibility of the controls later, when we add the functionality).
 
@@ -305,9 +306,12 @@ Inside the ``VerticalStackLayout`` on the ``SmartContractPage.xaml`` we place ou
 
     <Button Text="Init Contract" HorizontalOptions="Center" Margin="0,0,0,10" />
 
+    <Label Text="{Binding ContractAddress}" FontSize="15" HorizontalTextAlignment="Center" Margin="0,0,0,10"/>
     <Label Text="Current Counter" FontSize="30" HorizontalTextAlignment="Center" Margin="0,20,0,20"/>
+
     <Button Text="Query Counter" HorizontalOptions="Center" Margin="0,0,0,10" />
-    <Button Text="Increment Counter" HorizontalOptions="Center" />
+    <Button Text="Increment Counter" HorizontalOptions="Center" Margin="0,0,0,10" />
+    <Button Text="Reset Counter" HorizontalOptions="Center" />
 
 </VerticalStackLayout>
 ```
@@ -324,7 +328,7 @@ With MVVM you use **DataBinding to bound properties** of the view model to the U
 The view model inherits from the [**ObservableObject**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/observableobject) class in the MVVM Toolkit and every property that is needed for the UI gets exposed with a [**ObservableProperty**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/generators/observableproperty) attribute and every method with a [**RelayCommand**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/generators/relaycommand) attribute.
 
 #### Wallet
-Let's start with the view model for our wallet page. 
+Let's start with the view model for our wallet page.
 
 Create an folder "ViewModel" and add a new class ``WalletViewModel.cs``.
 Make the class public, partial and inherit from ``ObservableObject``:
@@ -337,6 +341,7 @@ namespace SimpleSecretMauiApp.ViewModel
     }
 }
 ```
+
 We need the following properties and methods exposed for the WalletPage:
 
 - property ``Address`` for the wallet address
@@ -475,7 +480,7 @@ If everything works you should see your brand new wallet address in the label an
 
 ![](../resources/create_wallet.png)
 
-Use this address in the [testnet faucet](https://faucet.pulsar.scrttestnet.com/) to fund the wallet with some $SCRT.
+**Use this address in the [testnet faucet](https://faucet.pulsar.scrttestnet.com/) to fund the wallet with some $SCRT.**
 
 Now we need to implement the ``GetBalance`` method, so that we can query the balance of our wallet.
 In the method we need also to convert the amount from uSCRT to SCRT.
@@ -528,12 +533,192 @@ and the bind the ``IsVisible`` property of the controls to the ``HasWallet`` pro
 ```
 
 #### Smart Contract
-
-
 For this example we will use the SECRET COUNTER contract from the [SECRET BOX](https://scrt.university/repositories/secret-box/secret-counter). 
 
+For our SmartContractPage add a new class ``SmartContractViewModel.cs`` to the ViewModel folder and make the class public, partial and inherit from ``ObservableObject`` just like before with the WalletViewModel.
+
+We need the following properties and methods exposed for the SmartContractPage:
+
+- property ``Counter`` for current counter value
+- property ``ContractAddress`` for the wallet balance
+- property ``HasContractInstance`` which indicates that we already have a initialized contract
+- method ``InitSmartContract`` to initialize a new smart contract instance
+- method ``GetCounter`` to increment the counter
+- method ``IncrementCounter`` to increment the counter
+- method ``ResetCounter`` to reset the counter
+
+```csharp
+public partial class SmartContractViewModel : ObservableObject
+{
+    [ObservableProperty]
+    public string contractAddress = "-";
+
+    [ObservableProperty]
+    public int? counter = null;
+
+    [ObservableProperty]
+    private bool hasContract = false;
+
+    [RelayCommand]
+    public async void InitSmartContract()
+    {
+        // TODO
+    }
+
+    [RelayCommand]
+    public async void GetCounter()
+    {
+        // TODO
+    }
+
+    [RelayCommand]
+    public async void IncrementCounter()
+    {
+        // TODO
+    }
+
+    [RelayCommand]
+    public async void ResetCounter()
+    {
+        // TODO
+    }
+}
+```
+
+##### Initialize a new smart contract instance 
 :information_source: **Secret.NET unfortunately cannot be connected to localsecret (Docker) yet**, as the docker image currently does not provide an encrypted connection on gRPC-web port 9091.
 As far as I know, .NET cannot be connected to an unencrypted port via gRPC-web unless it offers HTTP/2 exclusively, which is not the case with localsecret (it also runs HTTP 1.1 on port 9091). See [here](https://learn.microsoft.com/en-us/aspnet/core/grpc/troubleshoot?view=aspnetcore-6.0#call-insecure-grpc-services-with-net-core-client) and [here](https://learn.microsoft.com/en-us/aspnet/core/grpc/aspnetcore?view=aspnetcore-6.0&tabs=visual-studio#protocol-negotiation).
+
+So we need to use the testnet to create our contract. To keep things simple we use a contract already uploaded on testnet and initialize it via ``CodeId``. You can think of a ``CodeId`` as a defined class on the blockchain (an uploaded contract) from which you can create an new instance by using the ``CodeId``.
+
+Just like in the WalletViewModel let's start with avoiding the creating of a new instance every time the application is launched, we check beforehand if there is already one. We will implement it in a method ``Init()`` which we call in the constructor where we also get the instance of our ``SecretNetworkClient``.
+
+This time we need an additional storage, where we could store information about the smart contract instance. We will store a simple JSON object locally.
+
+```csharp
+private SecretNetworkClient _secretClient;
+private SmartContractInstance _smartContractInstance;
+private string _contractInstanceInfoFile = "smartContractInstance.json";
+private string _contractCodeHash;
+
+public SmartContractViewModel(SecretNetworkClient secretClient, IPrivateKeyStorage privateKeyStorage)
+{
+    _secretClient = secretClient;    
+    Init();
+}
+
+private async void Init()
+{
+    var stored_Instance = await AppUtils.ReadFile(_contractInstanceInfoFile);
+    if (!string.IsNullOrEmpty(stored_Instance))
+    {
+        _smartContractInstance = JsonConvert.DeserializeObject<SmartContractInstance>(stored_Instance);
+        if (!String.IsNullOrWhiteSpace(_smartContractInstance.Address))
+        {
+            HasContract = true;
+            ContractAddress = _smartContractInstance.Address;
+            _contractCodeHash = _smartContractInstance.CodeHash;
+        }
+    }
+}
+```
+
+Next we implement the ``InitSmartContract`` method.
+
+:information_source: **When interacting with a blockchain that changes its state you will need to have an wallet that signs the transactions and pays for the gasfees.** This is in contrast to just query the chain e.g. get the balance of an account.
+
+Since we change the state of the chain (create a new instance), we need to use a transaction and pay fees. To get an estimate how much the transaction will cost you can use the [``Tx.Simulate``](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.TxClient.htm) method on the Secret.NET client. In this example we use the ``AlwaysSimulateTransactions`` in ``CreateClientOptions`` when initializing the Secret.NET client, thus the client will simulate all transactions before sending, to get the estimated gas fees.
+
+```csharp
+private ulong _contractStoreCodeId = 17700;
+
+[RelayCommand]
+public async void InitSmartContract()
+{
+    if (!HasContract && _secretClient.Wallet != null)
+    {
+        try
+        {
+            _contractCodeHash = await _secretClient.Query.Compute.GetCodeHashByCodeId(_contractStoreCodeId);
+            if (!String.IsNullOrWhiteSpace(_contractCodeHash))
+            {
+                var msgInitContract = new SecretNET.Tx.MsgInstantiateContract(
+                                    codeId: _contractStoreCodeId,
+                                    label: $"SECRET.NET COUNTER {_contractStoreCodeId} #{new Random().Next(1, 999999)}", // must be unique
+                                    initMsg: new { count = 1 },
+                                    codeHash: _contractCodeHash); // optional but way faster
+
+                var initContractResponse = await _secretClient.Tx.Compute.InstantiateContract(msgInitContract);
+
+                if (initContractResponse.Code == 0 && initContractResponse?.Response?.Address != null)
+                {
+                    ContractAddress = initContractResponse.Response.Address;
+                    var instance = new SmartContractInstance()
+                    {
+                        Address = ContractAddress,
+                        CodeHash = _contractCodeHash,
+                    };
+                    await AppUtils.WriteFile(_contractInstanceInfoFile, JsonConvert.SerializeObject(instance));
+                    HasContract = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
+}
+```
+
+We then also need to **register our page and view model** like before:
+
+``MauiProgram.cs``
+
+```csharp
+builder.Services.AddSingleton<SmartContractPage>();
+builder.Services.AddSingleton<SmartContractViewModel>();
+```
+
+``SmartContractPage.xaml.cs``
+
+```csharp
+public partial class SmartContractPage : ContentPage
+{
+    public SmartContractPage(SmartContractViewModel viewModel)
+    {
+        BindingContext = viewModel;
+        InitializeComponent();
+    }
+}
+```
+
+Now let's bind our properties and commands to the SmartContractPage:
+
+```xml
+<VerticalStackLayout>
+
+    <Button Text="Init Contract" Command="{Binding InitSmartContractCommand}" HorizontalOptions="Center" Margin="0,0,0,10" />
+
+    <Label Text="{Binding Counter}" FontSize="30" HorizontalTextAlignment="Center" Margin="0,20,0,20"/>
+
+    <Button Text="Query Counter" Command="{Binding GetCounterCommand}" HorizontalOptions="Center" Margin="0,0,0,10" />
+    <Button Text="Increment Counter" Command="{Binding IncrementCounterCommand}" HorizontalOptions="Center" Margin="0,0,0,10" />
+    <Button Text="Reset Counter" Command="{Binding ResetCounterCommand}" HorizontalOptions="Center" />
+
+</VerticalStackLayout>
+```
+
+If you now run the app by hitting ``F5``, you should be able to create a new smart contract instance by clicking the button. 
+
+This will take a few seconds and if everything works you should see the contract address in the label:
+
+![](../resources/create_smart_contract_instance.png)
+
+Next we need to implement other methods ``GetCounter``, ``IncrementCounter`` and ``ResetCounter``.
+
+Calling 
+
 
 ### Run the app in the android simulator 
 
