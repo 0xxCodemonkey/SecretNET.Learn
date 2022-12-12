@@ -16,27 +16,29 @@ In the end you will have an mobile App that can run on Android, iOS and even on 
 
 # Table of Contents
 
-- Current options for building a secret mobile application
-    - JavaScript
-    - .NET / C#
-        - Secret.NET
-            - Additional packages
-        - What is .NET MAUI?
-            - Who .NET MAUI is for
-            - More information about .NET MAUI
-- Getting started
-    - Prerequisites
-    - Create a .NET MAUI project and app
-    - Install Secret.NET and other useful nuget packages
-    - Build the application
-        - Setup the Secret.NET client
-        - Create a Wallet
-        - Create the UI
-        - Add functionality
-            - Wallet
-            - Smart Contract
-        - Run the app in the android simulator
-- Congratulations
+- [Current options for building a secret mobile application](#current-options-for-building-a-secret-mobile-application)
+    - [JavaScript](#javascript)
+    - [.NET / C#](#net--c)
+        - [Secret.NET](#secretnet)
+            - [Additional packages](#additional-packages)
+        - [What is .NET MAUI?](#what-is-net-maui)
+            - [Who .NET MAUI is for](#who-net-maui-is-for)
+            - [More information about .NET MAUI](#more-informations-about-net-maui)
+- [Getting started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Create a .NET MAUI project and app](#create-a-net-maui-project-and-app)
+    - [Install Secret.NET and other useful nuget packages](#install-secretnet-and-other-useful-nuget-packages)
+    - [Build the application](#build-the-application)
+        - [Setup the Secret.NET client](#setup-the-secretnet-client)
+        - [Create the UI](#create-the-ui)
+            - [Wallet Page UI](#wallet-page-ui)
+            - [Smart Contract Page UI](#smart-contract-page-ui)
+        - [Add functionality](#add-functionality)
+            - [Wallet Page](#wallet-page)
+            - [Smart Contract Page](#smart-contract-page)
+        - [Run the app in the android simulator](#run-the-app-in-the-android-simulator)
+- [Congratulations](#congratulations)
+- [Additional resources](#additional-resources)
 
 # Current options for building a secret mobile application 
 If you want to write an cross-platform mobile application that works with Secret Network you have the choice of using **JavaScript** or **.NET / C#** (which is the focus of this article).
@@ -62,6 +64,8 @@ One advantage here, in contrast to the JavaScript solution, is that Secret.NET h
 Secret.NET is a full port of [secretjs](https://github.com/scrtlabs/secret.js) and e.g. supports every possible message and transaction type and handles input/output encryption/decryption for Secret Contracts.
 
 ![](../resources/SecretNET.png)
+
+**TODO: more details about Secret.NET, Links to docs & snippets, Examples, etc.** 
 
 #### Additional packages
 In addition the following complementary packages are available, which act as a layer on top of the Secret.NET:
@@ -327,7 +331,7 @@ With MVVM you use **DataBinding to bound properties** of the view model to the U
 
 The view model inherits from the [**ObservableObject**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/observableobject) class in the MVVM Toolkit and every property that is needed for the UI gets exposed with a [**ObservableProperty**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/generators/observableproperty) attribute and every method with a [**RelayCommand**](https://learn.microsoft.com/en-us/dotnet/communitytoolkit/mvvm/generators/relaycommand) attribute.
 
-#### Wallet
+#### Wallet Page
 Let's start with the view model for our wallet page.
 
 Create an folder "ViewModel" and add a new class ``WalletViewModel.cs``.
@@ -485,6 +489,8 @@ If everything works you should see your brand new wallet address in the label an
 Now we need to implement the ``GetBalance`` method, so that we can query the balance of our wallet.
 In the method we need also to convert the amount from uSCRT to SCRT.
 
+**TODO: general infos about Queries and Transactions, Overview of the SECRET.NET API structure ** 
+
 ```csharp
 [RelayCommand]
 public async void GetBalance()
@@ -532,8 +538,13 @@ and the bind the ``IsVisible`` property of the controls to the ``HasWallet`` pro
 <Button Text="Query balance" Command="{Binding GetBalanceCommand}" IsVisible="{Binding HasWallet}" HorizontalOptions="Center" />
 ```
 
-#### Smart Contract
+#### Smart Contract Page
 For this example we will use the SECRET COUNTER contract from the [SECRET BOX](https://scrt.university/repositories/secret-box/secret-counter). 
+
+**TODO:** 
+- **general infos about interaction with contracts / messages / error types / gas fees**
+- **Overview of the SECRET.NET API structure**
+- **Info about Secret.Token / Secret.NFT => can be used as reference for own implementations**
 
 For our SmartContractPage add a new class ``SmartContractViewModel.cs`` to the ViewModel folder and make the class public, partial and inherit from ``ObservableObject`` just like before with the WalletViewModel.
 
@@ -722,14 +733,6 @@ Calling
 
 ### Run the app in the android simulator 
 
-
-=> Beispiel App mit Navigation & Smart Contract => aus Projekt entnehmen und Repro verlinken => https://github.com/0xxCodemonkey/SecretNET.Examples
-
-## Secret Interaktionen
-=> Setup Wallet
-=> Secret Queries & Transaktionen
-=> Upload & Init Contract (Contract aus Uni nehmen!)
-=> Interact mit Contract
 
 # Congratulations
 
