@@ -638,7 +638,7 @@ private async void Init()
 
 Next we implement the ``InitSmartContract`` method.
 
-:information_source: **When interacting with a blockchain that changes its state you will need to have an wallet that signs the transactions and pays for the gasfees.** This is in contrast to just query the chain e.g. get the balance of an account.
+:information_source: **When interacting with a blockchain that changes its state you will need to have an wallet that signs the transactions and pays for the gas fees.** This is in contrast to just query the chain e.g. get the balance of an account.
 
 Since we change the state of the chain (create a new instance), we need to use a transaction and pay fees. To get an estimate how much the transaction will cost you can use the [``Tx.Simulate``](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.TxClient.htm) method on the Secret.NET client. In this example we use the ``AlwaysSimulateTransactions`` in ``CreateClientOptions`` when initializing the Secret.NET client, thus the client will simulate all transactions before sending, to get the estimated gas fees.
 
@@ -722,15 +722,55 @@ Now let's bind our properties and commands to the SmartContractPage:
 </VerticalStackLayout>
 ```
 
-If you now run the app by hitting ``F5``, you should be able to create a new smart contract instance by clicking the button. 
+If you now run the app by hitting ``F5``, you should be able to create a new smart contract instance by clicking the button.
 
 This will take a few seconds and if everything works you should see the contract address in the label:
 
 ![](../resources/create_smart_contract_instance.png)
 
-Next we need to implement other methods ``GetCounter``, ``IncrementCounter`` and ``ResetCounter``.
+##### Query and execute methods on a smart contract
 
-Calling 
+When interacting with a smart contract you have generally two types:
+
+**Query** the state of a smart contract:
+
+- costs no gas fee
+- doesn't need a wallet
+- synchronous method call
+
+**Execute methods** i.e. computation on a smart contract
+
+- costs gas fee
+- do need a wallet that signs the message and pays the gas fees
+- uses transactions and is an asynchronous method call
+
+In Secret.NET you will use ``Query.Compute.QueryContract`` ([doc](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Query.ComputeQueryClient.htm)) to **query a contract** e.g. like this:
+
+```csharp
+var queryMsg = new { get_count = new { } };
+var queryContractResult = await secretClient.Query.Compute.QueryContract<object>(contractAddress, queryMsg, contractCodeHash);
+Console.WriteLine("QueryContractResult:\r\n " + queryContractResult.Response);
+```
+
+To **execute a method** you will use ``Tx.Compute.ExecuteContract`` ([doc](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.ComputeTx.htm)) in Secret.NET e.g. like this:
+
+```csharp
+var executeMsg = new { increment = new { } };
+var msgExecuteContract = new MsgExecuteContract(
+                            contractAddress: contractAddress, 
+                            msg: executeMsg, 
+                            codeHash: contractCodeHash);
+var tx = await secretClient.Tx.Compute.ExecuteContract(msgExecuteContract);
+Console.WriteLine($"(Gas used: {tx.GasUsed} - Gas wanted {tx.GasWanted})");
+Console.WriteLine($"\r\n{tx.RawLog}");
+```
+
+In our example we need to implement these other methods:
+
+- ``GetCounter`` (Query)
+- ``IncrementCounter`` and ``ResetCounter`` (Execute)
+
+ 
 
 
 ### Run the app in the android simulator 
