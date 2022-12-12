@@ -103,6 +103,8 @@ Using .NET MAUI, you can create multi-platform apps using a single project, but 
 ## Prerequisites
 You will need [Visual Studio 2022 (17.4)](https://visualstudio.microsoft.com/downloads/) (not Visual Studio Code)  with the .NET MAUI workload installed and you should be familiar with C# and .NET. 
 
+Even though this example was created on a Windows PC, it should also work the same way on a Mac.
+
 Since this is primarily an article about Secret.NET and not about C# / .NET I will only briefly point out the most important basics here. If you want to learn more about C# I suggest you to start [here](https://dotnet.microsoft.com/en-us/learn/csharp).
 
 If you don't know .NET MAUI I definitely recommend you to go through the learning path [here!](https://learn.microsoft.com/en-us/training/paths/build-apps-with-dotnet-maui/), watch the [.NET MAUI for Beginners video series](https://www.youtube.com/playlist?list=PLdo4fOcmZ0oUBAdL2NwBpDs32zwGqb9DY) or check the [.NET MAUI documentation](https://learn.microsoft.com/en-us/dotnet/maui/?WT.mc_id=dotnet-35129-website&view=net-maui-7.0) and the [Enterprise Application Patterns Using .NET MAUI](https://learn.microsoft.com/en-us/dotnet/architecture/maui/).
