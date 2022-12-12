@@ -638,9 +638,9 @@ private async void Init()
 
 Next we implement the ``InitSmartContract`` method.
 
-:information_source: **When interacting with a blockchain that changes its state you will need to have an wallet that signs the transactions and pays for the gas fees.** This is in contrast to just query the chain e.g. get the balance of an account.
+:information_source: **When interacting with a blockchain that changes its state you will need to have an wallet that signs the transactions and pays for the gas fees.** This is in contrast to just query the state of the chain e.g. get the balance of an account.
 
-Since we change the state of the chain (create a new instance), we need to use a transaction and pay fees. To get an estimate how much the transaction will cost you can use the [``Tx.Simulate``](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.TxClient.htm) method on the Secret.NET client. In this example we use the ``AlwaysSimulateTransactions`` in ``CreateClientOptions`` when initializing the Secret.NET client, thus the client will simulate all transactions before sending, to get the estimated gas fees.
+Since we change the state of the chain (create a new instance), we need to use a transaction and pay gas fees. To get an estimate how much the transaction will cost you can use the [``Tx.Simulate``](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.TxClient.htm) method on the Secret.NET client. In this example we use the ``AlwaysSimulateTransactions`` in ``CreateClientOptions`` when initializing the Secret.NET client, thus the client will simulate all transactions before sending, to get the estimated gas fees.
 
 ```csharp
 private ulong _contractStoreCodeId = 17700;
