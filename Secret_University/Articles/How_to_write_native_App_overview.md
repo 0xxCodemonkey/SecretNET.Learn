@@ -22,7 +22,6 @@ By the end of this article, you will have a mobile app that can run on Android, 
     - [JavaScript](#javascript)
     - [.NET / C#](#net--c)
       - [Secret.NET](#secretnet)
-        - [Additional packages](#additional-packages)
       - [What is .NET MAUI?](#what-is-net-maui)
         - [Who .NET MAUI is for](#who-net-maui-is-for)
         - [More information about .NET MAUI:](#more-information-about-net-maui)
@@ -41,7 +40,7 @@ By the end of this article, you will have a mobile app that can run on Android, 
         - [Smart Contract Page](#smart-contract-page)
           - [Initialize a new smart contract instance](#initialize-a-new-smart-contract-instance)
           - [Query and execute methods on a smart contract](#query-and-execute-methods-on-a-smart-contract)
-      - [Run the app in the android simulator](#run-the-app-in-the-android-simulator)
+      - [Run the app in the android emulator](#run-the-app-in-the-android-emulator)
   - [Congratulations](#congratulations)
   - [Additional resources](#additional-resources)
 
@@ -65,20 +64,35 @@ One advantage here, in contrast to the JavaScript solution, is that Secret.NET h
 
 [Secret.NET](https://github.com/0xxCodemonkey/SecretNET) is a .NET Library for interacting with Secret Network. The library is written in .NET 6 and supports MAUI.
 
-Secret.NET is a full port of [secretjs](https://github.com/scrtlabs/secret.js). It supports every possible message and transaction type and handles input/output & encryption/decryption for Secret Contracts.
-
 ![](../resources/SecretNET.png)
 
-**TODO: more details about Secret.NET, Links to docs & snippets, Examples, etc.**
-**TODO: general infos about Queries and Transactions, Overview of the SECRET.NET API structure **
+**Secret.NET** is a full port of [**secretjs**](https://github.com/scrtlabs/secret.js). It supports every possible message and transaction type and handles input/output & encryption/decryption for Secret Contracts.
 
-##### Additional packages
+With Secret.NET you can **perform all available actions for both the Cosmos SDK part and the Secret Network part** such as:
 
-In addition the following complementary packages are available, which act as a layer on top of the Secret.NET:
+- Account
+- Bank
+- Authorization
+- Governance
+- Staking
+- Feegrant
+- and much more.
+
+In addition the following **complementary packages** are available, which act as a layer on top of the Secret.NET:
 
 - [**SecretNET.Token**](https://github.com/0xxCodemonkey/SecretNET.Token) supports all methods of the [reference implementation](https://github.com/scrtlabs/snip20-reference-impl) for the [**SNIP20 contract**](https://docs.scrt.network/secret-network-documentation/development/snips/snip-20-spec-private-fungible-tokens).
 
 - [**SecretNET.NFT**](https://github.com/0xxCodemonkey/SecretNET.NFT) supports all methods of the [reference implementation](https://github.com/baedrik/snip721-reference-impl) for the [**SNIP721 contract**](https://docs.scrt.network/secret-network-documentation/development/snips/snip-721-private-non-fungible-tokens-nfts).
+
+For more details look at the [GitHub Repro](https://github.com/0xxCodemonkey/SecretNET), the [Secret.NET library documentation](https://0xxcodemonkey.github.io/SecretNET/html/T-SecretNET.SecretNetworkClient.htm) or in the [official secret network documentation](https://docs.scrt.network/secret-network-documentation/development/tools-and-libraries/secret-net).
+
+**Some code examples** can be found here:
+
+- [Secret.NET Example](https://github.com/0xxCodemonkey/SecretNET/blob/main/examples/SecretNET.Examples/Program.cs)
+- [SecretNET.Token Example](https://github.com/0xxCodemonkey/SecretNET.Token/blob/main/examples/SecretNET.Token.Examples/Program.cs)
+- [SecretNET.NFT Example](https://github.com/0xxCodemonkey/SecretNET.NFT/blob/main/examples/SecretNET.NFT.Examples/Program.cs)
+
+
 
 #### What is .NET MAUI?
 
@@ -909,7 +923,12 @@ Congratulations, you have build your first secret native cross-platform mobile a
 
 ## Additional resources
 
-**TODO:**
+### Build a typed Secret.NET package for your own smart contracts
 
+If you want to use a more complex custom smart contract in your application, it is a good idea to create a custom typed package or class for it. 
 
-- **Info about Secret.Token / Secret.NFT => can be used as reference for own implementations**
+A good reference for this are the two existing packages [**Secret.Token**](https://github.com/0xxCodemonkey/SecretNET.Token) and [**Secret.NFT**](https://github.com/0xxCodemonkey/SecretNET.NFT). 
+
+These are typed packets for a [**SNIP20**](https://docs.scrt.network/secret-network-documentation/development/snips/snip-20-spec-private-fungible-tokens) (token) [contract](https://github.com/scrtlabs/snip20-reference-impl) or a [**SNIP721**](https://docs.scrt.network/secret-network-documentation/development/snips/snip-721-private-non-fungible-tokens-nfts) (NFT) [contract](https://github.com/baedrik/snip721-reference-impl).
+
+For can find some code examples of how to use these packages [here for **SNIP20**](https://docs.scrt.network/secret-network-documentation/development/tools-and-libraries/secret-net/snippets/snip20) and [here for **SNIP721**](https://docs.scrt.network/secret-network-documentation/development/tools-and-libraries/secret-net/snippets/snip721).
