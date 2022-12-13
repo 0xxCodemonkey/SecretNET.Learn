@@ -70,6 +70,7 @@ Secret.NET is a full port of [secretjs](https://github.com/scrtlabs/secret.js). 
 ![](../resources/SecretNET.png)
 
 **TODO: more details about Secret.NET, Links to docs & snippets, Examples, etc.**
+**TODO: general infos about Queries and Transactions, Overview of the SECRET.NET API structure **
 
 ##### Additional packages
 
@@ -505,12 +506,10 @@ If everything works you should see your brand new wallet address in the label, a
 
 ![](../resources/create_wallet.png)
 
-**Use this address in the [testnet faucet](https://faucet.pulsar.scrttestnet.com/) to fund the wallet with some $SCRT.**
+**Use this address in the [Secret's testnet faucet](https://faucet.pulsar.scrttestnet.com/) to fund the wallet with some $SCRT.**
 
 Now we need to implement the `GetBalance` method so that we can query the balance of our wallet.
 In the method we also need to convert the amount from uSCRT to SCRT.
-
-**TODO: general infos about Queries and Transactions, Overview of the SECRET.NET API structure **
 
 ```csharp
 [RelayCommand]
@@ -563,12 +562,6 @@ and bind the `IsVisible` property of the controls to the `HasWallet` property:
 
 For this example we will use the SECRET COUNTER contract from this [SECRET BOX](https://scrt.university/repositories/secret-box/secret-counter).
 
-**TODO:**
-
-- **general infos about interaction with contracts / messages / error types / gas fees**
-- **Overview of the SECRET.NET API structure**
-- **Info about Secret.Token / Secret.NFT => can be used as reference for own implementations**
-
 For our SmartContractPage add a new class `SmartContractViewModel.cs` to the ViewModel folder and make the class public, partial and inherit from `ObservableObject` just like before with the WalletViewModel.
 
 We need the following properties and methods exposed for the SmartContractPage:
@@ -600,19 +593,19 @@ public partial class SmartContractViewModel : ObservableObject
     }
 
     [RelayCommand]
-    public async void GetCounter()
+    public async Task GetCounter()
     {
         // TODO
     }
 
     [RelayCommand]
-    public async void IncrementCounter()
+    public async Task IncrementCounter()
     {
         // TODO
     }
 
     [RelayCommand]
-    public async void ResetCounter()
+    public async Task ResetCounter()
     {
         // TODO
     }
@@ -777,7 +770,7 @@ Console.WriteLine("QueryContractResult:\r\n " + queryContractResult.Response);
 To **execute a method** you will use `Tx.Compute.ExecuteContract` ([doc](https://0xxcodemonkey.github.io/SecretNET/html/AllMembers.T-SecretNET.Tx.ComputeTx.htm)) in Secret.NET e.g. like this:
 
 ```csharp
-var executeMsg = new { increment = new { } };
+var executeMsg = new { increment = new { } }; // this can also be a JSON-object (string)
 var msgExecuteContract = new MsgExecuteContract(
                             contractAddress: contractAddress,
                             msg: executeMsg,
@@ -792,10 +785,131 @@ In our example we need to implement these other methods:
 - `GetCounter` (Query)
 - `IncrementCounter` and `ResetCounter` (Execute)
 
-#### Run the app in the android simulator
+Let's start with the `GetCounter` query:
+
+```csharp
+[RelayCommand]
+public async void GetCounter()
+{
+    if (!string.IsNullOrWhiteSpace(this.ContractAddress))
+    {
+        try
+        {
+            // Query
+            var queryMsg = new { get_count = new { } };
+            var queryContractResult = await _secretClient.Query.Compute.QueryContract<string>(contractAddress, queryMsg, _contractCodeHash);
+
+            if (queryContractResult?.Response != null)
+            {
+                // here you can also use dedicated DTOs for strongly typed deserialization instead of 'dynamic'
+                dynamic response = JObject.Parse(queryContractResult.Response);
+                Counter = (int)response.count;
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
+}
+```
+
+For the `IncrementCounter` and `ResetCounter` we need to use the `Tx.Compute.ExecuteContract` method:
+
+```csharp
+[RelayCommand]
+public async Task IncrementCounter()
+{
+    if (!string.IsNullOrWhiteSpace(this.ContractAddress))
+    {
+        try
+        {
+            // Execute
+            var executeMsg = new { increment = new { } };
+
+            var msgExecuteContract = new MsgExecuteContract(
+                        contractAddress: contractAddress,
+                        msg: executeMsg,
+                        codeHash: _contractCodeHash);
+
+            var executeContractResponse = await _secretClient.Tx.Compute.ExecuteContract(msgExecuteContract);
+
+            if (executeContractResponse.Code == 0)
+            {
+                Thread.Sleep(1000); // give some time to let it distribute
+
+                await GetCounter(); // get updated count
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
+}
+
+[RelayCommand]
+public async Task ResetCounter()
+{
+    if (!string.IsNullOrWhiteSpace(this.ContractAddress))
+    {
+        try
+        {
+            // Execute
+            var executeMsg = new { reset = new { count = 0 } };
+
+            var msgExecuteContract = new MsgExecuteContract(
+                        contractAddress: contractAddress,
+                        msg: executeMsg,
+                        codeHash: _contractCodeHash);
+
+            var executeContractResponse = await _secretClient.Tx.Compute.ExecuteContract(msgExecuteContract);
+
+            if (executeContractResponse.Code == 0)
+            {
+                Thread.Sleep(1000); // give some time to let it distribute
+
+                await GetCounter(); // get updated count
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex.Message);
+        }
+    }
+}
+```
+
+Finally we should hide the "Init Contract" button if there we already have a smart contract instance. Instead we should show the "Query Counter", "Increment Counter", "Reset Counter" buttons and the labels.
+
+Try to implement this yourself (tip: look at the wallet page).
+
+When you are ready run the app by hitting `F5` and check if everything works.
+
+#### Run the app in the android emulator
+
+To run the app in the android emulator you must check if you already have an emulator / device installed and add a new one if needed:
+
+![](../resources/android_device_manager.png)
+
+![](../resources/android_device_manager_devices.png)
+
+Then select the android emulator and run the app by hitting `F5`:
+
+![](../resources/select_android_emulator.png)
+
+You should now see the emulator starting and the first deployment could take some minutes. 
+When finished it should look like this, and note that here the tab bar is displayed at the bottom, as it is usual on android:
+
+![](../resources/android_emulator.png)
 
 ## Congratulations
 
 Congratulations, you have build your first secret native cross-platform mobile application :)
 
 ## Additional resources
+
+**TODO:**
+
+
+- **Info about Secret.Token / Secret.NFT => can be used as reference for own implementations**
